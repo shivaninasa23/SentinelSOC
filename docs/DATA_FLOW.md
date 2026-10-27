@@ -1,0 +1,5 @@
+# Data flow and lifecycle
+
+Authentication events are emitted by the application's login handler and include success/failure outcomes. API events are normalized, persisted, audited, evaluated and broadcast only after transaction commit. Repeated event UUIDs return the existing row. Import uploads are parsed in memory, previewed before persistence, linked to an `event_import` record and tagged as imported through source/provenance fields. Alert evidence stores event IDs and detection parameters. Incidents link alerts and notes to analyst identities; lifecycle changes and assignments are audited transactionally.
+
+Retention is operator-run with a dry-run-first CLI. Alert-linked evidence events are kept; application audit records are not immutable against database administrators. Back up before pruning and coordinate incident evidence retention. External OTX responses are cached by provider/IP with expiry; provider errors remain unavailable/unknown and are not translated into benign verdicts. Do not place secrets or tokens in event metadata.

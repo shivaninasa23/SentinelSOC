@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block heading %}{{ kind }} investigation{% endblock %}
+{% block content %}
+<div class="panel detail-panel">
+  <span class="eyebrow">{{ kind|upper }} DETAIL{% if item.get('simulated') %} · SIMULATED{% endif %}</span>
+  <h2>{{ item.get('title',item.get('rule',item.get('event_type','Record'))) }}</h2>
+  {% if kind == 'Alert' %}
+  <div class="workflow-bar"><label for="alert-assignee">Assigned analyst</label><select id="alert-assignee"><option value="">Unassigned</option></select><button class="btn-outline" onclick="assignAlert('{{ item.id }}')">Save assignment</button><button class="btn-outline" onclick="updateAlert('{{ item.id }}','acknowledged')">Acknowledge</button><button class="btn-primary" onclick="createIncident('{{ item.id }}')">Create incident</button></div>
+  {% elif kind == 'Incident' %}
+  <div class="workflow-bar"><label for="incident-assignee">Assigned analyst</label><select id="incident-assignee"><option value="">Unassigned</option></select><button class="btn-outline" onclick="assignIncident('{{ item.id }}')">Save assignment</button></div>
+  <label class="field-label" for="incident-note">Investigation note</label><textarea id="incident-note" placeholder="Add a timeline note" maxlength="5000"></textarea>
+  <label class="field-label" for="resolution-notes">Resolution notes (required to resolve or close)</label><textarea id="resolution-notes" placeholder="Document the resolution" maxlength="5000">{{ item.get('resolution_notes') or '' }}</textarea>
+  <select id="incident-status"><option value="open" {% if item.status=='open' %}selected{% endif %}>open</option><option value="investigating" {% if item.status=='investigating' %}selected{% endif %}>investigating</option><option value="resolved" {% if item.status=='resolved' %}selected{% endif %}>resolved</option><option value="closed" {% if item.status=='closed' %}selected{% endif %}>closed</option></select><button class="btn-primary" onclick="updateIncident('{{ item.id }}')">Save update</button>
+  <div class="workflow-bar mt-3"><label for="related-alert">Link related alert ID</label><input id="related-alert" placeholder="Alert UUID"><button class="btn-outline" onclick="linkAlert('{{ item.id }}')">Link alert</button><a class="btn-outline" href="/api/export/incident/{{ item.id }}.html">Download investigation report</a></div>
+  {% endif %}
+  <pre>{{ item|tojson(indent=2) }}</pre>
+</div>
+<script>window.SENTINEL_KIND={{ kind|tojson }};window.SENTINEL_ITEM={{ item|tojson }};</script>
+{% endblock %}
